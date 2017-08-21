@@ -1,4 +1,3 @@
-
 setClass('myDate')
 setAs("character","myDate", function(from) as.Date(from, format="%d/%m/%Y") )
 data <- read.csv("household_power_consumption.txt",sep = ";",dec = ".",stringsAsFactors=FALSE,
@@ -9,9 +8,14 @@ library(dplyr)
 newData <- filter(data, Date=="2007-02-01" | Date=="2007-02-02")
 newData$Global_active_power <- gsub("\\?","NA",newData$Global_active_power)
 newData$Global_active_power <- as.numeric(newData$Global_active_power)
-png('plot1.png')
-hist(newData$Global_active_power,xlab="Global Active Power (kilowatts)",main="Global Active Power",col = "red")
+
+temp <- mutate(newData,datetime=paste(Date,Time))
+temp$datetime <- as.POSIXct(strptime(temp$datetime,"%Y-%m-%d %H:%M:%S"))
+
+png('plot3.png')
+plot(temp$datetime,temp$Sub_metering_1,type="l",ylab="Energy sub metering",xlab="")
+lines(temp$datetime,temp$Sub_metering_2,type="l",col="red")
+lines(temp$datetime,temp$Sub_metering_3,type="l",col="blue")
+legend("topright",legend=c("Sub_metering_1","Sub_metering_2","Sub_metering_3"),
+       lty=c(1,1,1),col=c("black","red","blue"),cex=0.8)
 dev.off()
-
-
-
